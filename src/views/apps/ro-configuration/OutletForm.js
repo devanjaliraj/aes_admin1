@@ -46,15 +46,14 @@ class OutletForm extends React.Component {
       selectedNozzleToEachBayOptions:null,
       selectedNozzleOptions:null,
       tankToNozzlesOptions:[],
-      selectedTankToNozzlesOptions:null
+      selectedTankToNozzlesOptions:null,
+      tankProductOptionsNew:[],
+      tankCapacityOptionsNew:[]
       };
      
   }
 
-  componentDidMount() {
-
-
-    
+  componentDidMount() { 
     let { id } = this.props.match.params.id;
     this.setState({ dealerId : id });
     axios
@@ -132,6 +131,79 @@ class OutletForm extends React.Component {
       .catch((error) => {
         console.log(error.response);
       });
+
+      
+      let tankProductArray = []
+      axios
+      .get(`http://3.108.185.7/nodejs/api/dealer/allproduct`)
+      .then((response) => { 
+        if(response.status === 200){
+          let data = response.data.data;
+          console.log('datadatadata allproduct@@@@@@@@@@@@###',data.length)
+
+          let tankProductObj ={}
+          if(data.length > 0){
+            data.map((tank) => {
+            tankProductObj = {
+                 value: tank._id, 
+                 label: tank.product
+               };
+               tankProductArray.push(tankProductObj)
+             })
+             
+            this.setState({ tankProductOptionsNew : tankProductArray})
+          }
+
+        }
+        else{
+          alert('Something went wrong in tank product Api');
+        }
+       }) 
+      .catch((error) => {
+        console.log(error.response);
+      });
+
+        // Tank
+    // axios
+    // .get("http://3.108.185.7/nodejs/api/dealer/gettank")
+    // .then((response) => {
+    //   console.log(response.data.data);
+    //   this.setState({ tankN: response.data.data });
+    // })
+    // .catch((error) => {
+    //   console.log(error);
+    // });
+
+      let tankCapacityArray = []
+      axios
+      .get(`http://3.108.185.7/nodejs/api/dealer/allcapacity`)
+      .then((response) => { 
+        if(response.status === 200){
+          let data = response.data.data;
+          console.log('datadatadata allcapacity@@@@@@@@@@@@###',data)
+
+          let tankCapacityObj ={}
+          if(data.length > 0){
+            data.map((tank) => {
+            tankCapacityObj = {
+                 value: tank._id, 
+                 label: tank.capacity
+               };
+               tankCapacityArray.push(tankCapacityObj)
+             })
+             
+            this.setState({ tankCapacityOptionsNew : tankCapacityArray})
+          }
+
+        }
+        else{
+          alert('Something went wrong in tank capacity Api');
+        }
+       }) 
+      .catch((error) => {
+        console.log(error.response);
+      });
+
   }
 
   handleChangeTank = (selectedTankOption) => {
@@ -146,6 +218,7 @@ class OutletForm extends React.Component {
        return event
       } 
    });
+   console.log('@@######filteredProTank',filteredProTank);
    let obj1 ={}
    if(filteredProTank.length > 0){
      this.setState({ selectedTankCapacity : filteredProTank[0].product})
@@ -289,6 +362,8 @@ class OutletForm extends React.Component {
       // nozzleToEachBayOptions,
       // selectedNozzleToEachBayOptions,
       selectedNozzleOptions,
+      tankProductOptionsNew,
+      tankCapacityOptionsNew
       // tankToNozzlesOptions,
       // selectedTankToNozzlesOptions
     } = this.state
@@ -310,6 +385,8 @@ class OutletForm extends React.Component {
                     options={tankOptions}
                     value={selectedTankOption}
                     onChange={this.handleChangeTank}
+                    menuPlacement="auto"
+                    maxMenuHeight={220}
                   />
               </Col>
               <Col md="6" sm="12">
@@ -319,9 +396,14 @@ class OutletForm extends React.Component {
                     classNamePrefix="select"
                     name="product_map_tank"            
                     isClearable={true}
-                    defaultValue={tankProductOptions[1]}
-                    options={tankProductOptions}
-                    value={tankProductOptions[1]}  
+                    // defaultValue={tankProductOptions[1]}
+                    // options={tankProductOptions}
+                    // value={tankProductOptions[1]}
+                    defaultValue={tankProductOptionsNew[1]}
+                    options={tankProductOptionsNew}
+                    value={tankProductOptionsNew[1]}
+                    menuPlacement="auto"
+                    maxMenuHeight={220}  
                   />
               </Col>
               <Col md="6" sm="12">
@@ -332,9 +414,14 @@ class OutletForm extends React.Component {
                 onChange={this.handleChangeTank} 
                 name="capacity"         
                 isClearable={true}
-                value={tankCapacityOptions[1]}
-                defaultValue={tankCapacityOptions[1]}
-                options={tankCapacityOptions}
+                // value={tankCapacityOptions[1]}
+                // defaultValue={tankCapacityOptions[1]}
+                // options={tankCapacityOptions}
+                defaultValue={tankCapacityOptionsNew[1]}
+                options={tankCapacityOptionsNew}
+                value={tankCapacityOptionsNew[1]}
+                menuPlacement="auto"
+                maxMenuHeight={220}
               />
             </Col>
             <Col md="6" sm="12">
@@ -348,6 +435,8 @@ class OutletForm extends React.Component {
                 value={selectedMpdOption}
                 onChange={this.handleChangeMPD}
                 isClearable={true}
+                menuPlacement="auto"
+                maxMenuHeight={220}
               />
             </Col>
             {/* <Col md="6" sm="12">
@@ -372,6 +461,8 @@ class OutletForm extends React.Component {
                 defaultValue={selectedBayOptions}
                 options={bayOptions}
                 onChange={this.handleChangeBay}
+                menuPlacement="auto"
+                maxMenuHeight={220}
               />
             </Col>
             {/* <Col md="6" sm="12">
@@ -398,6 +489,8 @@ class OutletForm extends React.Component {
                 defaultValue={selectedNozzleOptions}
                 options={nozzleOptions}
                 onChange={this.handleChangeNozzle}
+                menuPlacement="auto"
+                maxMenuHeight={220}
               />
             </Col>
             {/* <Col md="6" sm="12" style={{ marginBottom: 15 }}>

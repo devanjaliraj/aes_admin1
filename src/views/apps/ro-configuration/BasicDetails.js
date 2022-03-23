@@ -27,41 +27,55 @@ export default class BasicDetails extends Component {
         master_oil_company:"",
         location:"",
         omc_customer_code:"",
+        // district:"",
+        districts:[],
         state:"",
-        district:"",
-       
     };
     this.state = {
       mocN: [],
-     cityS:[],
-     stateC:[]
+      instate: [],
+      city:[]
+     
     };
     this.submitHandler = this.submitHandler.bind(this);
   }
+  getState = () => {
+    fetch('http://3.108.185.7/nodejs/api/admin/allstate', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify()
+    }).then((res) => res.json())
+    .then((json) => {
+      this.setState({ instate: json.data })
+      console.log("state", json)
+    });
+    
+  }
+
+  handleChange = event => {
+    fetch('http://3.108.185.7/nodejs/api/admin/allcity', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        state: event.target.value
+      })
+    }).then((res) => res.json())
+    .then((json) => {
+      this.setState({ city: json.data[0].districts })
+    });
+    
+  }
 
   componentDidMount() {
-    
-  //  state
-  axios
-  .get("http://3.108.185.7/nodejs/api/admin/allstate")
-  .then((response) => {
-    console.log(response.data.data);
-    this.setState({ stateC: response.data.data });
-  })
-  .catch((error) => {
-    console.log(error);
-  });
+    this.getState()        
+  
 
-  //  city
-  axios
-  .get("http://3.108.185.7/nodejs/api/admin/allcity")
-  .then((response) => {
-    console.log(response.data.data);
-    this.setState({ cityS: response.data.data });
-  })
-  .catch((error) => {
-    console.log(error);
-  });
 
 
     // MOC
@@ -88,8 +102,8 @@ export default class BasicDetails extends Component {
             location: response.data.data.location,
             omc_customer_code: response.data.data.omc_customer_code,
             state: response.data.data.state,
-            district: response.data.data.district,
-           
+            // district: response.data.data.district,
+             districts: response.data.data.districts,
         });
       })
       .catch(error => {
@@ -110,12 +124,23 @@ export default class BasicDetails extends Component {
         // swal("Success!", "Submitted SuccessFull!", "success");
         this.props.history.push("/app/ro-configuration/RoConfigurationList");
       })
+
+  //       //  state
+  // axios
+  // .post(`http://3.108.185.7/nodejs/api/admin/allstate/${id}`)
+  // .then(response => {
+  //   console.log(response.data.data);
+  //   this.setState({ stateC: response.data.data });
+  // })
+ 
       .catch(error => {
         console.log(error);
       });
   };
 
   render() {
+    const { addTodo, list } = this.props;
+    let { instate, city } = this.state;
     return (
       <div>
         <Row>
@@ -217,39 +242,41 @@ export default class BasicDetails extends Component {
                 </Col>
               
               <Col md="6" sm="12">
-                <FormGroup>
+               
                 <Label>State</Label>
-                  <CustomInput 
+                <CustomInput
+                  type="select" value={this.state.value} onChange={this.handleChange}>            
+           {instate.map((item) => {
+              return <option value={item.state} >{item.state}</option>
+            })}
+          </CustomInput>
+                  {/* <CustomInput 
                     type="select"
                     name="state"
                     value={this.state.state}
                     onChange={this.changeHandler}>
-                      {this.state.stateC?.map((statep) => (
-                      <option value={statep._id} key={statep._id}>
-                        {statep.name}
+                       {this.state.cityS?.map((cityp) => (
+                      <option value={cityp._id} key={cityp._id}>
+                        {cityp.state}
                       </option>
                     ))}
-                  </CustomInput>
-                </FormGroup>
+                  </CustomInput> */}
+                
               </Col>
               
                 <Col md="6" sm="12">
-                <FormGroup>
+               
                 <Label>District </Label>
-                  <CustomInput 
-                  type="select"
-                  name="district"
-                    value={this.state.district}
-                    onChange={this.changeHandler}>
-                        {this.state.cityS?.map((cityp) => (
-                      <option value={cityp._id} key={cityp._id}>
-                        {cityp.name}
-                      </option>
-                    ))}
-                  </CustomInput>
-                </FormGroup>
+                 
+                <CustomInput
+                  type="select">
+            {city.map((item) => {
+              return <option value={item} >{item}</option>
+            })}
+          </CustomInput>
+               
               </Col>
-                
+             
 
               </Row>
 
